@@ -9714,9 +9714,7 @@ addcmd("unflyjump", {"noflyjump"}, function(args, speaker)
 	if flyjump then flyjump:Disconnect() end
 end)
 
-
-_G.HumanModCons = _G.HumanModCons or {}
-local HumanModCons = _G.HumanModCons
+local HumanModCons = {}
 
 addcmd('autojump',{'ajump'},function(args, speaker)
 	local Char = speaker.Character
@@ -10186,6 +10184,25 @@ addcmd('spoofjumppower',{'spoofjp'},function(args, speaker)
 		else
 			notify('Incompatible Exploit','Your exploit does not support this command (missing hookmetamethod)')
 		end
+	end
+end)
+
+addcmd('defaultws', {}, function(args, speaker)
+	local Char = speaker.Character or workspace:FindFirstChild(speaker.Name)
+	local Human = Char and Char:FindFirstChildWhichIsA("Humanoid")
+
+	-- Call unloopws logic directly (no need for command lookup)
+	if HumanModCons then
+		HumanModCons.wsLoop = (HumanModCons.wsLoop and HumanModCons.wsLoop:Disconnect() and false) or nil
+		HumanModCons.wsCA = (HumanModCons.wsCA and HumanModCons.wsCA:Disconnect() and false) or nil
+	end
+
+	-- Restore default WalkSpeed
+	if shared.OriginalWalkSpeed and Human then
+		Human.WalkSpeed = shared.OriginalWalkSpeed
+		notify("✅ WalkSpeed reset to game's default: " .. tostring(shared.OriginalWalkSpeed))
+	else
+		notify("⚠️ No default WalkSpeed recorded. You may need to respawn first.")
 	end
 end)
 
